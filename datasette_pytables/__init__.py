@@ -1,5 +1,7 @@
 import tables
 
+_connector_type = 'pytables'
+
 def inspect(path):
     "Open file and return tables info"
     h5tables = {}
@@ -23,4 +25,4 @@ def inspect(path):
         }
 
     h5file.close()
-    return h5tables, views
+    return h5tables, views, _connector_type
