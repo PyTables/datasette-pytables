@@ -26,3 +26,11 @@ def inspect(path):
 
     h5file.close()
     return h5tables, views, _connector_type
+
+class Connection:
+    def __init__(self, path):
+        self.path = path
+        self.h5file = tables.open_file(path)
+
+    def execute(self, sql, params):
+        return [], False, []
