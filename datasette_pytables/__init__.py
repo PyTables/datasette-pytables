@@ -105,6 +105,8 @@ class Row(OrderedDict):
     def __getitem__(self, label):
         if type(label) is int:
             return super(OrderedDict, self).__getitem__(list(self.keys())[label])
+        else:
+            return super(OrderedDict, self).__getitem__(label)
 
     def __iter__(self):
         return self.values().__iter__()
