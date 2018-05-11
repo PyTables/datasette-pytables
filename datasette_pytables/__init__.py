@@ -69,8 +69,9 @@ class Connection:
         else:
             table_rows = table.iterrows()
 
+        # Prepare rows
         if len(fields) == 1 and fields[0] == 'count(*)':
-            rows.append(Row({'count(*)': table.nrows}))
+            rows.append(Row({fields[0]: table.nrows}))
         else:
             for table_row in table_rows:
                 row = Row()
@@ -84,10 +85,16 @@ class Connection:
                         row[field] = table_row[field]
                 rows.append(row)
 
-        description = ((col,) for col in table.colnames)
+        # Prepare query description
+        for field in fields:
+            if field == '*':
+                for col in table.colnames:
+                    description.append((col,))
+            else:
+                description.append((field,))
 
         if truncate:
-            return rows, truncated, description
+            return rows, truncated, tuple(description)
         else:
             return rows
 
@@ -95,3 +102,6 @@ class Row(OrderedDict):
     def __getitem__(self, label):
         if type(label) is int:
             return super(OrderedDict, self).__getitem__(list(self.keys())[label])
+
+    def __iter__(self):
+        return self.values().__iter__()
