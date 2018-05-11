@@ -80,7 +80,10 @@ class Connection:
                         row[field] = table_row.nrow
                     elif field == '*':
                         for col in table.colnames:
-                            row[col] = table_row[col]
+                            value = table_row[col]
+                            if type(value) is bytes:
+                                value = value.decode('utf-8')
+                            row[col] = value
                     else:
                         row[field] = table_row[field]
                 rows.append(row)
