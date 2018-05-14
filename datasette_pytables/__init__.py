@@ -43,6 +43,8 @@ def _parse_sql(sql):
             else:
                 current_keyword = str(token)
             parsed_sql[current_keyword] = ""
+        elif type(token) is sqlparse.sql.Where:
+            parsed_sql['where'] = token
         else:
             if not token.is_whitespace:
                 parsed_sql[current_keyword] += str(token)
@@ -65,7 +67,17 @@ class Connection:
 
         # Use 'where' statement or get all the rows
         if 'where' in parsed_sql:
-            pass
+            query = ''
+            start = 0
+            end = table.nrows
+            for condition in parsed_sql['where'].get_sublists():
+                if str(condition) == '"rowid"=:p0':
+                    start = int(params['p0'])
+                    end = start + 1
+            if query:
+                table_rows = table.where(query, start, end)
+            else:
+                table_rows = table.iterrows(start, end)
         else:
             table_rows = table.iterrows()
 
