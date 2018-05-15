@@ -99,19 +99,26 @@ class Connection:
 
         # Use 'where' statement or get all the rows
         if 'where' in parsed_sql:
-            query = []
+            query = ''
             start = 0
             end = table.nrows
-            for condition in parsed_sql['where'].get_sublists():
-                if str(condition) == '"rowid"=:p0':
-                    start = int(params['p0'])
-                    end = start + 1
-                else:
-                    translated, params = _translate_condition(table, condition, params)
-                    query.append(translated)
+            try:
+                conditions = []
+                for condition in parsed_sql['where'].get_sublists():
+                    if str(condition) == '"rowid"=:p0':
+                        start = int(params['p0'])
+                        end = start + 1
+                    else:
+                        translated, params = _translate_condition(table, condition, params)
+                        conditions.append(translated)
+                if conditions:
+                    query = ') & ('.join(conditions)
+                    query = '(' + query + ')'
+            except:
+                # Probably it's a PyTables query
+                query = str(parsed_sql['where'])[6:]    # without where keyword
+
             if query:
-                query = ') & ('.join(query)
-                query = '(' + query + ')'
                 table_rows = table.where(query, params, start, end)
             else:
                 table_rows = table.iterrows(start, end)
