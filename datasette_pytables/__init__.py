@@ -1,6 +1,6 @@
-import tables
-import sqlparse
 from collections import OrderedDict
+import sqlparse
+import tables
 
 _connector_type = 'pytables'
 
@@ -50,12 +50,44 @@ def _parse_sql(sql):
                 parsed_sql[current_keyword] += str(token)
     return parsed_sql
 
+_operators = {
+    '=': '==',
+}
+
+def _translate_condition(table, condition, params):
+    field = condition.left.get_real_name()
+
+    operator = list(filter(lambda t: t.ttype == sqlparse.tokens.Comparison, condition.tokens))[0]
+    if operator.value in _operators:
+        operator = _operators[operator.value]
+    else:
+        operator = operator.value
+
+    value = condition.right.value
+    if value.startswith(':'):
+        # Value is a parameters
+        value = value[1:]
+        if value in params:
+            # Cast value to the column type
+            coltype = table.coltypes[field]
+            if coltype == 'string':
+                params[value] = str(params[value])
+            elif coltype.startswith('int'):
+                params[value] = int(params[value])
+            elif coltype.startswith('float'):
+                params[value] = float(params[value])
+
+    translated = "{left} {operator} {right}".format(left=field, operator=operator, right=value)
+    return translated, params
+
 class Connection:
     def __init__(self, path):
         self.path = path
         self.h5file = tables.open_file(path)
 
     def execute(self, sql, params=None, truncate=False):
+        if params is None:
+            params = {}
         rows = []
         truncated = False
         description = []
@@ -67,15 +99,20 @@ class Connection:
 
         # Use 'where' statement or get all the rows
         if 'where' in parsed_sql:
-            query = ''
+            query = []
             start = 0
             end = table.nrows
             for condition in parsed_sql['where'].get_sublists():
                 if str(condition) == '"rowid"=:p0':
                     start = int(params['p0'])
                     end = start + 1
+                else:
+                    translated, params = _translate_condition(table, condition, params)
+                    query.append(translated)
             if query:
-                table_rows = table.where(query, start, end)
+                query = ') & ('.join(query)
+                query = '(' + query + ')'
+                table_rows = table.where(query, params, start, end)
             else:
                 table_rows = table.iterrows(start, end)
         else:
@@ -108,6 +145,7 @@ class Connection:
             else:
                 description.append((field,))
 
+        # Return the rows
         if truncate:
             return rows, truncated, tuple(description)
         else:
