@@ -19,7 +19,7 @@ def inspect(path):
             'name': table._v_pathname,
             'columns': colnames,
             'primary_keys': [],
-            'count': table.nrows,
+            'count': int(table.nrows),
             'label_column': None,
             'hidden': False,
             'fts_table': None,
@@ -120,13 +120,13 @@ class Connection:
 
         # Prepare rows
         if len(fields) == 1 and fields[0] == 'count(*)':
-            rows.append(Row({fields[0]: table.nrows}))
+            rows.append(Row({fields[0]: int(table.nrows)}))
         else:
             for table_row in table_rows:
                 row = Row()
                 for field in fields:
                     if field == 'rowid':
-                        row[field] = table_row.nrow
+                        row[field] = int(table_row.nrow)
                     elif field == '*':
                         for col in table.colnames:
                             value = table_row[col]
