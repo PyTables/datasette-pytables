@@ -97,11 +97,12 @@ class Connection:
         table_rows = []
         fields = parsed_sql['select'].split(',')
 
+        query = ''
+        start = 0
+        end = table.nrows
+
         # Use 'where' statement or get all the rows
         if 'where' in parsed_sql:
-            query = ''
-            start = 0
-            end = table.nrows
             try:
                 conditions = []
                 for condition in parsed_sql['where'].get_sublists():
@@ -118,12 +119,17 @@ class Connection:
                 # Probably it's a PyTables query
                 query = str(parsed_sql['where'])[6:]    # without where keyword
 
-            if query:
-                table_rows = table.where(query, params, start, end)
-            else:
-                table_rows = table.iterrows(start, end)
+        # Limit number of rows
+        if 'limit' in parsed_sql:
+            max_rows = int(parsed_sql['limit'])
+            if end - start > max_rows:
+                end = start + max_rows
+
+        # Execute query
+        if query:
+            table_rows = table.where(query, params, start, end)
         else:
-            table_rows = table.iterrows()
+            table_rows = table.iterrows(start, end)
 
         # Prepare rows
         if len(fields) == 1 and fields[0] == 'count(*)':
