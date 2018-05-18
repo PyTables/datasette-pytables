@@ -1,5 +1,6 @@
 from collections import OrderedDict
-import sqlparse
+from moz_sql_parser import parse
+import re
 import tables
 
 _connector_type = 'pytables'
@@ -29,56 +30,29 @@ def inspect(path):
     h5file.close()
     return h5tables, views, _connector_type
 
-def _parse_sql(sql):
-    parsed = sqlparse.parse(sql)
-    stmt = parsed[0]
-    parsed_sql = {}
-    current_keyword = ""
-    for token in stmt.tokens:
-        if token.is_keyword:
-            if current_keyword in parsed_sql and parsed_sql[current_keyword] == '':
-                # Check composed keywords like 'order by'
-                del parsed_sql[current_keyword]
-                current_keyword += " " + str(token)
-            else:
-                current_keyword = str(token)
-            parsed_sql[current_keyword] = ""
-        elif type(token) is sqlparse.sql.Where:
-            parsed_sql['where'] = token
-        else:
-            if not token.is_whitespace:
-                parsed_sql[current_keyword] += str(token)
-    return parsed_sql
+def _parse_sql(sql, params):
+    # Table name
+    sql = re.sub('(?i)from \[(.*)]', 'from "\g<1>"', sql)
+    # Params
+    for param in params:
+        sql = sql.replace(":" + param, param)
+
+    parsed = parse(sql)
+    if type(parsed['select']) is not list:
+        parsed['select'] = [parsed['select']]
+
+    return parsed
 
 _operators = {
-    '=': '==',
+    'eq': '==',
+    'neq': '!=',
+    'gt': '>',
+    'gte': '>=',
+    'lt': '<',
+    'lte': '<=',
+    'and': '&',
+    'or': '|',
 }
-
-def _translate_condition(table, condition, params):
-    field = condition.left.get_real_name()
-
-    operator = list(filter(lambda t: t.ttype == sqlparse.tokens.Comparison, condition.tokens))[0]
-    if operator.value in _operators:
-        operator = _operators[operator.value]
-    else:
-        operator = operator.value
-
-    value = condition.right.value
-    if value.startswith(':'):
-        # Value is a parameters
-        value = value[1:]
-        if value in params:
-            # Cast value to the column type
-            coltype = table.coltypes[field]
-            if coltype == 'string':
-                params[value] = str(params[value])
-            elif coltype.startswith('int'):
-                params[value] = int(params[value])
-            elif coltype.startswith('float'):
-                params[value] = float(params[value])
-
-    translated = "{left} {operator} {right}".format(left=field, operator=operator, right=value)
-    return translated, params
 
 class Connection:
     def __init__(self, path):
@@ -92,29 +66,55 @@ class Connection:
         truncated = False
         description = []
 
-        parsed_sql = _parse_sql(sql)
-        table = self.h5file.get_node(parsed_sql['from'][1:-1])
+        parsed_sql = _parse_sql(sql, params)
+        table = self.h5file.get_node(parsed_sql['from'])
         table_rows = []
-        fields = parsed_sql['select'].split(',')
+        fields = parsed_sql['select']
 
         query = ''
         start = 0
         end = table.nrows
 
         # Use 'where' statement or get all the rows
+        def _cast_param(field, pname):
+            # Cast value to the column type
+            coltype = table.coltypes[field]
+            fcast = None
+            if coltype == 'string':
+                fcast = str
+            elif coltype.startswith('int'):
+                fcast = int
+            elif coltype.startswith('float'):
+                fcast = float
+            if fcast:
+                params[pname] = fcast(params[pname])
+
+        def _translate_where(where):
+            # Translate SQL to PyTables expression
+            expr = ''
+            operator = list(where)[0]
+
+            if operator in ['and', 'or']:
+                subexpr = ["({})".format(_translate_where(q)) for q in where[operator]]
+                expr = " {} ".format(_operators[operator]).join(subexpr)
+            elif where == {'eq': ['rowid', 'p0']}:
+                nonlocal start, end
+                start = int(params['p0'])
+                end = start + 1
+            else:
+                left, right = where[operator]
+                if left in params:
+                    _cast_param(right, left)
+                elif right in params:
+                    _cast_param(left, right)
+
+                expr = "{left} {operator} {right}".format(left=left, operator=_operators.get(operator, operator), right=right)
+
+            return expr
+
         if 'where' in parsed_sql:
             try:
-                conditions = []
-                for condition in parsed_sql['where'].get_sublists():
-                    if str(condition) == '"rowid"=:p0':
-                        start = int(params['p0'])
-                        end = start + 1
-                    else:
-                        translated, params = _translate_condition(table, condition, params)
-                        conditions.append(translated)
-                if conditions:
-                    query = ') & ('.join(conditions)
-                    query = '(' + query + ')'
+                query = _translate_where(parsed_sql['where'])
             except:
                 # Probably it's a PyTables query
                 query = str(parsed_sql['where'])[6:]    # without where keyword
@@ -132,26 +132,27 @@ class Connection:
             table_rows = table.iterrows(start, end)
 
         # Prepare rows
-        if len(fields) == 1 and fields[0] == 'count(*)':
-            rows.append(Row({fields[0]: int(table.nrows)}))
+        if len(fields) == 1 and type(fields[0]['value']) is dict and \
+           fields[0]['value'].get('count') == '*':
+            rows.append(Row({'count(*)': int(table.nrows)}))
         else:
             for table_row in table_rows:
                 row = Row()
                 for field in fields:
-                    if field == 'rowid':
-                        row[field] = int(table_row.nrow)
-                    elif field == '*':
+                    if field['value'] == 'rowid':
+                        row['rowid'] = int(table_row.nrow)
+                    elif field['value'] == '*':
                         for col in table.colnames:
                             value = table_row[col]
                             if type(value) is bytes:
                                 value = value.decode('utf-8')
                             row[col] = value
                     else:
-                        row[field] = table_row[field]
+                        row[field['value']] = table_row[field['value']]
                 rows.append(row)
 
         # Prepare query description
-        for field in fields:
+        for field in [f['value'] for f in fields]:
             if field == '*':
                 for col in table.colnames:
                     description.append((col,))
