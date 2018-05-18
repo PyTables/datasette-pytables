@@ -37,7 +37,19 @@ def _parse_sql(sql, params):
     for param in params:
         sql = sql.replace(":" + param, param)
 
-    parsed = parse(sql)
+    try:
+        parsed = parse(sql)
+    except:
+        # Propably it's a PyTables expression
+        for token in ['group by', 'order by', 'limit']:
+            res = re.search('(?i)where (.*)' + token, sql)
+            if res:
+                modified_sql = re.sub('(?i)where (.*)(' + token + ')', '\g<2>', sql)
+                parsed = parse(modified_sql)
+                parsed['where'] = res.group(1)
+                break
+
+    # Always a list of fields
     if type(parsed['select']) is not list:
         parsed['select'] = [parsed['select']]
 
@@ -113,11 +125,10 @@ class Connection:
             return expr
 
         if 'where' in parsed_sql:
-            try:
+            if type(parsed_sql['where']) is dict:
                 query = _translate_where(parsed_sql['where'])
-            except:
-                # Probably it's a PyTables query
-                query = str(parsed_sql['where'])[6:]    # without where keyword
+            else:
+                query = parsed_sql['where']
 
         # Limit number of rows
         if 'limit' in parsed_sql:
