@@ -107,8 +107,12 @@ class Connection:
             operator = list(where)[0]
 
             if operator in ['and', 'or']:
-                subexpr = ["({})".format(_translate_where(q)) for q in where[operator]]
+                subexpr = [_translate_where(e) for e in where[operator]]
+                subexpr = filter(lambda e: e, subexpr)
+                subexpr = ["({})".format(e) for e in subexpr]
                 expr = " {} ".format(_operators[operator]).join(subexpr)
+            elif operator == 'exists':
+                pass
             elif where == {'eq': ['rowid', 'p0']}:
                 nonlocal start, end
                 start = int(params['p0'])
@@ -150,16 +154,19 @@ class Connection:
             for table_row in table_rows:
                 row = Row()
                 for field in fields:
-                    if field['value'] == 'rowid':
+                    field_name = field['value']
+                    if type(field_name) is dict and 'distinct' in field_name:
+                        field_name = field_name['distinct']
+                    if field_name == 'rowid':
                         row['rowid'] = int(table_row.nrow)
-                    elif field['value'] == '*':
+                    elif field_name == '*':
                         for col in table.colnames:
                             value = table_row[col]
                             if type(value) is bytes:
                                 value = value.decode('utf-8')
                             row[col] = value
                     else:
-                        row[field['value']] = table_row[field['value']]
+                        row[field_name] = table_row[field_name]
                 rows.append(row)
 
         # Prepare query description
