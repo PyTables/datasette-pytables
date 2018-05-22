@@ -151,29 +151,51 @@ class Connection:
            fields[0]['value'].get('count') == '*':
             rows.append(Row({'count(*)': int(table.nrows)}))
         else:
-            for table_row in table_rows:
-                row = Row()
-                for field in fields:
-                    field_name = field['value']
-                    if type(field_name) is dict and 'distinct' in field_name:
-                        field_name = field_name['distinct']
-                    if field_name == 'rowid':
-                        row['rowid'] = int(table_row.nrow)
-                    elif field_name == '*':
-                        for col in table.colnames:
-                            value = table_row[col]
+            if type(table) is tables.table.Table:
+                for table_row in table_rows:
+                    row = Row()
+                    for field in fields:
+                        field_name = field['value']
+                        if type(field_name) is dict and 'distinct' in field_name:
+                            field_name = field_name['distinct']
+                        if field_name == 'rowid':
+                            row['rowid'] = int(table_row.nrow)
+                        elif field_name == '*':
+                            for col in table.colnames:
+                                value = table_row[col]
+                                if type(value) is bytes:
+                                    value = value.decode('utf-8')
+                                row[col] = value
+                        else:
+                            row[field_name] = table_row[field_name]
+                    rows.append(row)
+            else:
+                # Any kind of array
+                rowid = start - 1
+                for table_row in table_rows:
+                    row = Row()
+                    rowid += 1
+                    for field in fields:
+                        field_name = field['value']
+                        if type(field_name) is dict and 'distinct' in field_name:
+                            field_name = field_name['distinct']
+                        if field_name == 'rowid':
+                            row['rowid'] = rowid
+                        else:
+                            value = table_row
                             if type(value) is bytes:
                                 value = value.decode('utf-8')
-                            row[col] = value
-                    else:
-                        row[field_name] = table_row[field_name]
-                rows.append(row)
+                            row['value'] = value
+                    rows.append(row)
 
         # Prepare query description
         for field in [f['value'] for f in fields]:
             if field == '*':
-                for col in table.colnames:
-                    description.append((col,))
+                if type(table) is tables.table.Table:
+                    for col in table.colnames:
+                        description.append((col,))
+                else:
+                    description.append(('value',))
             else:
                 description.append((field,))
 
