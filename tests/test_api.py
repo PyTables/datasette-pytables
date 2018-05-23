@@ -72,3 +72,37 @@ def test_custom_sql(app_client):
     assert ['identity'] == data['columns']
     assert 'test_tables' == data['database']
     assert data['truncated']
+
+def test_invalid_custom_sql(app_client):
+    response = app_client.get(
+        '/test_tables.json?sql=.schema',
+        gather_request=False
+    )
+    assert response.status == 400
+    assert response.json['ok'] is False
+    assert 'Statement must be a SELECT' == response.json['error']
+
+def test_table_json(app_client):
+    response = app_client.get(
+        '/test_tables/%2Fgroup2%2Ftable2.json?_shape=objects',
+        gather_request=False
+    )
+    assert response.status == 200
+    data = response.json
+    assert data['query']['sql'] == 'select rowid, * from [/group2/table2] order by rowid limit 51'
+    assert data['rows'][3:6] == [{
+        'rowid': 3,
+        'identity': 'This is particle:  3',
+        'idnumber': 3,
+        'speed': 6.0
+    }, {
+        'rowid': 4,
+        'identity': 'This is particle:  4',
+        'idnumber': 4,
+        'speed': 8.0
+    }, {
+        'rowid': 5,
+        'identity': 'This is particle:  5',
+        'idnumber': 5,
+        'speed': 10.0
+    }]
