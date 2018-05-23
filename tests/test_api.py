@@ -63,6 +63,7 @@ def test_custom_sql(app_client):
         'sql': 'select identity from [/group1/table1]',
         'params': {}
     } == data['query']
+    assert 50 == len(data['rows'])
     assert [
         {'identity': 'This is particle:  0'},
         {'identity': 'This is particle:  1'},
