@@ -41,12 +41,12 @@ def _parse_sql(sql, params):
         parsed = parse(sql)
     except:
         # Propably it's a PyTables expression
-        for token in ['group by', 'order by', 'limit']:
+        for token in ['group by', 'order by', 'limit', '']:
             res = re.search('(?i)where (.*)' + token, sql)
             if res:
                 modified_sql = re.sub('(?i)where (.*)(' + token + ')', '\g<2>', sql)
                 parsed = parse(modified_sql)
-                parsed['where'] = res.group(1)
+                parsed['where'] = res.group(1).strip()
                 break
 
     # Always a list of fields
