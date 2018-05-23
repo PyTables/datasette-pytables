@@ -26,6 +26,7 @@ setup(
             'pytables = datasette_pytables'
         ],
     },
-    install_requires=['datasette', 'tables', 'moz-sql-parser', 'mo-future']
+    install_requires=['datasette', 'tables', 'moz-sql-parser', 'mo-future'],
+    tests_require=['pytest']
 )
 
