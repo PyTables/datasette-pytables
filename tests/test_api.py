@@ -116,3 +116,13 @@ def test_table_not_exists_json(app_client):
     } == app_client.get(
         '/test_tables/blah.json', gather_request=False
     ).json
+
+def test_table_shape_arrays(app_client):
+    response = app_client.get(
+        '/test_tables/%2Fgroup2%2Ftable2.json?_shape=arrays',
+        gather_request=False
+    )
+    assert [
+        [6, 'This is particle:  6', 6, 12.0],
+        [7, 'This is particle:  7', 7, 14.0],
+    ] == response.json['rows'][6:8]
