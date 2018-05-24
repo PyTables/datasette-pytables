@@ -126,3 +126,49 @@ def test_table_shape_arrays(app_client):
         [6, 'This is particle:  6', 6, 12.0],
         [7, 'This is particle:  7', 7, 14.0],
     ] == response.json['rows'][6:8]
+
+def test_table_shape_objects(app_client):
+    response = app_client.get(
+        '/test_tables/%2Fgroup2%2Ftable2.json?_shape=objects',
+        gather_request=False
+    )
+    assert [{
+        'rowid': 6,
+        'identity': 'This is particle:  6',
+        'idnumber': 6,
+        'speed': 12.0,
+    }, {
+        'rowid': 7,
+        'identity': 'This is particle:  7',
+        'idnumber': 7,
+        'speed': 14.0,
+    }] == response.json['rows'][6:8]
+
+def test_table_shape_array(app_client):
+    response = app_client.get(
+        '/test_tables/%2Fgroup2%2Ftable2.json?_shape=array',
+        gather_request=False
+    )
+    assert [{
+        'rowid': 6,
+        'identity': 'This is particle:  6',
+        'idnumber': 6,
+        'speed': 12.0,
+    }, {
+        'rowid': 7,
+        'identity': 'This is particle:  7',
+        'idnumber': 7,
+        'speed': 14.0,
+    }] == response.json[6:8]
+
+def test_table_shape_invalid(app_client):
+    response = app_client.get(
+        '/test_tables/%2Fgroup2%2Ftable2.json?_shape=invalid',
+        gather_request=False
+    )
+    assert {
+        'ok': False,
+        'error': 'Invalid _shape: invalid',
+        'status': 400,
+        'title': None,
+    } == response.json
