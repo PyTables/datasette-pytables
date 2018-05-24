@@ -79,6 +79,10 @@ class Connection:
         description = []
 
         parsed_sql = _parse_sql(sql, params)
+
+        if parsed_sql['from'] == 'sqlite_master':
+            return self._execute_datasette_query(sql, params)
+
         table = self.h5file.get_node(parsed_sql['from'])
         table_rows = []
         fields = parsed_sql['select']
@@ -210,6 +214,23 @@ class Connection:
             return rows, truncated, tuple(description)
         else:
             return rows
+
+    def _execute_datasette_query(self, sql, params):
+        "Datasette special queries for getting tables info"
+        if sql == "SELECT count(*) from sqlite_master WHERE type = 'view' and name=:n":
+            row = Row()
+            row['count(*)'] = 0
+            return [row]
+        elif sql == 'select sql from sqlite_master where name = :n and type="table"':
+            try:
+                table = self.h5file.get_node(params['n'])
+                row = Row()
+                row['sql'] = 'CREATE TABLE {} ()'.format(params['n'])
+                return [row]
+            except:
+                return []
+        else:
+            raise Exception("SQLite queries cannot be executed with this connector")
 
 class Row(OrderedDict):
     def __getitem__(self, label):
