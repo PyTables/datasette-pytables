@@ -63,7 +63,7 @@ def test_custom_sql(app_client):
         'sql': 'select identity from [/group1/table1]',
         'params': {}
     } == data['query']
-    assert 50 == len(data['rows'])
+    assert 1000 == len(data['rows'])
     assert [
         {'identity': 'This is particle:  0'},
         {'identity': 'This is particle:  1'},
@@ -172,3 +172,25 @@ def test_table_shape_invalid(app_client):
         'status': 400,
         'title': None,
     } == response.json
+
+@pytest.mark.parametrize('path, expected_rows, expected_pages', [
+    ('/test_tables/%2Farray1.json', 2, 1),
+    ('/test_tables/%2Farray1.json?_size=1', 2, 2),
+    ('/test_tables/%2Fgroup1%2Farray2.json?_size=1000', 10000, 10),
+])
+def test_paginate_tables_and_arrays(app_client, path, expected_rows, expected_pages):
+    fetched = []
+    count = 0
+    while path:
+        response = app_client.get(path, gather_request=False)
+        print("*****", response.json)
+        assert 200 == response.status
+        count += 1
+        fetched.extend(response.json['rows'])
+        path = response.json['next_url']
+        if path:
+            assert response.json['next']
+            assert '_next={}'.format(response.json['next']) in path
+
+    assert expected_rows == len(fetched)
+    assert expected_pages == count

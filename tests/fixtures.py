@@ -11,7 +11,7 @@ def app_client(max_returned_rows=None):
             [filepath],
             config={
                 'default_page_size': 50,
-                'max_returned_rows': max_returned_rows or 100,
+                'max_returned_rows': max_returned_rows or 1000,
             }
         )
         client = ds.app().test_client
