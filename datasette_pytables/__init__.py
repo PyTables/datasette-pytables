@@ -94,7 +94,10 @@ class Connection:
         # Use 'where' statement or get all the rows
         def _cast_param(field, pname):
             # Cast value to the column type
-            coltype = table.coltypes[field]
+            if type(table) is tables.table.Table:
+                coltype = table.coltypes[field]
+            else:
+                coltype = table.dtype.name
             fcast = None
             if coltype == 'string':
                 fcast = str
@@ -107,6 +110,7 @@ class Connection:
 
         def _translate_where(where):
             # Translate SQL to PyTables expression
+            nonlocal start, end
             expr = ''
             operator = list(where)[0]
 
@@ -118,9 +122,10 @@ class Connection:
             elif operator == 'exists':
                 pass
             elif where == {'eq': ['rowid', 'p0']}:
-                nonlocal start, end
                 start = int(params['p0'])
                 end = start + 1
+            elif where == {'gt': ['rowid', 'p0']}:
+                start = int(params['p0']) + 1
             else:
                 left, right = where[operator]
                 if left in params:
