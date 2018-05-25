@@ -71,7 +71,7 @@ class Connection:
         self.path = path
         self.h5file = tables.open_file(path)
 
-    def execute(self, sql, params=None, truncate=False, page_size=None):
+    def execute(self, sql, params=None, truncate=False, page_size=None, max_returned_rows=None):
         if params is None:
             params = {}
         rows = []
@@ -145,9 +145,11 @@ class Connection:
                 end = start + max_rows
 
         # Truncate if needed
-        if page_size and truncate:
-            if end - start > page_size:
-                end = start + page_size
+        if page_size and max_returned_rows and truncate:
+            if max_returned_rows == page_size:
+                max_returned_rows += 1
+            if end - start > max_returned_rows:
+                end = start + max_returned_rows
                 truncated = True
 
         # Execute query
