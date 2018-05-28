@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from moz_sql_parser import parse
 import re
 import tables
