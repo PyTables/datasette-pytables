@@ -80,7 +80,9 @@ class Connection:
         parsed_sql = _parse_sql(sql, params)
 
         if parsed_sql['from'] == 'sqlite_master':
-            return self._execute_datasette_query(sql, params)
+            rows = self._execute_datasette_query(sql, params)
+            description = (('value',))
+            return rows, truncated, description
 
         table = self.h5file.get_node(parsed_sql['from'])
         table_rows = []
@@ -216,10 +218,7 @@ class Connection:
                 description.append((field,))
 
         # Return the rows
-        if truncate:
-            return rows, truncated, tuple(description)
-        else:
-            return rows
+        return rows, truncated, tuple(description)
 
     def _execute_datasette_query(self, sql, params):
         "Datasette special queries for getting tables info"
