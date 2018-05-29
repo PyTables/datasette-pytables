@@ -57,13 +57,36 @@ def test_database_page(app_client):
 def test_custom_sql(app_client):
     response = app_client.get(
         '/test_tables.json?' + urlencode({
+            'sql': 'select identity from [/group1/table1]',
+            '_shape': 'objects'
+        }),
+        gather_request=False
+    )
+    data = response.json
+    assert {
+        'sql': 'select identity from [/group1/table1]',
+        'params': {}
+    } == data['query']
+    assert 1000 == len(data['rows'])
+    assert [
+        {'identity': 'This is particle:  0'},
+        {'identity': 'This is particle:  1'},
+        {'identity': 'This is particle:  2'},
+        {'identity': 'This is particle:  3'}
+    ] == data['rows'][:4]
+    assert ['identity'] == data['columns']
+    assert 'test_tables' == data['database']
+    assert data['truncated']
+
+def test_custom_complex_sql(app_client):
+    response = app_client.get(
+        '/test_tables.json?' + urlencode({
             'sql': 'select identity from [/group1/table1] where speed > 100 and idnumber < 55',
             '_shape': 'objects'
         }),
         gather_request=False
     )
     data = response.json
-    print("*************************", data)
     assert {
         'sql': 'select identity from [/group1/table1] where speed > 100 and idnumber < 55',
         'params': {}
@@ -77,7 +100,7 @@ def test_custom_sql(app_client):
     ] == data['rows']
     assert ['identity'] == data['columns']
     assert 'test_tables' == data['database']
-    assert False == data['truncated']
+    assert not data['truncated']
 
 def test_custom_pytables_sql(app_client):
     response = app_client.get(
@@ -100,7 +123,7 @@ def test_custom_pytables_sql(app_client):
     ] == data['rows'][:3]
     assert ['identity'] == data['columns']
     assert 'test_tables' == data['database']
-    assert data['truncated']
+    assert not data['truncated']
 
 def test_invalid_custom_sql(app_client):
     response = app_client.get(

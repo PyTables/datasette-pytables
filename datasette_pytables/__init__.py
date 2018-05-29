@@ -145,18 +145,14 @@ class Connection:
                 query = parsed_sql['where']
 
         # Limit number of rows
+        limit = None
         if 'limit' in parsed_sql:
-            max_rows = int(parsed_sql['limit'])
-            if end - start > max_rows:
-                end = start + max_rows
+            limit = int(parsed_sql['limit'])
 
         # Truncate if needed
         if page_size and max_returned_rows and truncate:
             if max_returned_rows == page_size:
                 max_returned_rows += 1
-            if end - start > max_returned_rows:
-                end = start + max_returned_rows
-                truncated = True
 
         # Execute query
         if query:
@@ -170,7 +166,14 @@ class Connection:
             rows.append(Row({'count(*)': int(table.nrows)}))
         else:
             if type(table) is tables.table.Table:
+                count = 0
                 for table_row in table_rows:
+                    count += 1
+                    if limit and count > limit:
+                        break
+                    if truncate and max_returned_rows and count > max_returned_rows:
+                        truncated = True
+                        break
                     row = Row()
                     for field in fields:
                         field_name = field['value']
@@ -190,7 +193,14 @@ class Connection:
             else:
                 # Any kind of array
                 rowid = start - 1
+                count = 0
                 for table_row in table_rows:
+                    count += 1
+                    if limit and count > limit:
+                        break
+                    if truncate and max_returned_rows and count > max_returned_rows:
+                        truncated = True
+                        break
                     row = Row()
                     rowid += 1
                     for field in fields:
