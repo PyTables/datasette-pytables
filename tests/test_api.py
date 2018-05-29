@@ -1,5 +1,6 @@
 from .fixtures import app_client
 import pytest
+from urllib.parse import urlencode
 
 pytest.fixture(scope='module')(app_client)
 
@@ -55,19 +56,46 @@ def test_database_page(app_client):
 
 def test_custom_sql(app_client):
     response = app_client.get(
-        '/test_tables.json?sql=select+identity+from+[/group1/table1]&_shape=objects',
+        '/test_tables.json?' + urlencode({
+            'sql': 'select identity from [/group1/table1] where speed > 100 and identity < 55',
+            '_shape': 'objects'
+        }),
         gather_request=False
     )
     data = response.json
     assert {
-        'sql': 'select identity from [/group1/table1]',
+        'sql': 'select identity from [/group1/table1] where speed > 100 and identity < 55',
         'params': {}
     } == data['query']
-    assert 1000 == len(data['rows'])
+    assert 4 == len(data['rows'])
     assert [
-        {'identity': 'This is particle:  0'},
-        {'identity': 'This is particle:  1'},
-        {'identity': 'This is particle:  2'}
+        {'identity': 'This is particle: 51'},
+        {'identity': 'This is particle: 52'},
+        {'identity': 'This is particle: 53'},
+        {'identity': 'This is particle: 54'}
+    ] == data['rows']
+    assert ['identity'] == data['columns']
+    assert 'test_tables' == data['database']
+    assert False == data['truncated']
+
+def test_custom_pytables_sql(app_client):
+    response = app_client.get(
+        '/test_tables.json?' + urlencode({
+            'sql': 'select identity from [/group1/table1] where (speed > 100) & (speed < 500)',
+            '_shape': 'objects'
+            }),
+        gather_request=False
+    )
+    data = response.json
+    assert {
+        'sql': 'select identity from [/group1/table1] where (speed > 100) & (speed < 500)',
+        'params': {}
+    } == data['query']
+    assert 199 == len(data['rows'])
+    assert [
+        {'identity': 'This is particle: 51'},
+        {'identity': 'This is particle: 52'},
+        {'identity': 'This is particle: 53'}
     ] == data['rows'][:3]
     assert ['identity'] == data['columns']
     assert 'test_tables' == data['database']
