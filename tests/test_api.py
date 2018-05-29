@@ -57,14 +57,15 @@ def test_database_page(app_client):
 def test_custom_sql(app_client):
     response = app_client.get(
         '/test_tables.json?' + urlencode({
-            'sql': 'select identity from [/group1/table1] where speed > 100 and identity < 55',
+            'sql': 'select identity from [/group1/table1] where speed > 100 and idnumber < 55',
             '_shape': 'objects'
         }),
         gather_request=False
     )
     data = response.json
+    print("*************************", data)
     assert {
-        'sql': 'select identity from [/group1/table1] where speed > 100 and identity < 55',
+        'sql': 'select identity from [/group1/table1] where speed > 100 and idnumber < 55',
         'params': {}
     } == data['query']
     assert 4 == len(data['rows'])
