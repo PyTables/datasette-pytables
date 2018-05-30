@@ -1,4 +1,5 @@
 from datasette.app import Datasette
+import numpy as np
 import os
 from tables import *
 import tempfile
@@ -36,6 +37,8 @@ def populate_file(filepath):
     table2 = h5file.create_table(group2, 'table2', Particle)
 
     array2 = h5file.create_array(group1, 'array2', [x for x in range(10000)])
+
+    multiarray = h5file.create_array(group2, 'multi', np.arange(1000).reshape(10, 50, 2))
 
     for table in (table1, table2):
         row = table.row

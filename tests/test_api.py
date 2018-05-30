@@ -10,7 +10,7 @@ def test_homepage(app_client):
     assert response.json.keys() == {'test_tables': 0}.keys()
     d = response.json['test_tables']
     assert d['name'] == 'test_tables'
-    assert d['tables_count'] == 4
+    assert d['tables_count'] == 5
 
 def test_database_page(app_client):
     response = app_client.get('/test_tables.json', gather_request=False)
@@ -39,6 +39,15 @@ def test_database_page(app_client):
         'columns': ['identity', 'idnumber', 'speed'],
         'primary_keys': [],
         'count': 10000,
+        'label_column': None,
+        'hidden': False,
+        'fts_table': None,
+        'foreign_keys': {'incoming': [], 'outgoing': []}
+    }, {
+        'name': '/group2/multi',
+        'columns': [],
+        'primary_keys': [],
+        'count': 10,
         'label_column': None,
         'hidden': False,
         'fts_table': None,
@@ -229,6 +238,7 @@ def test_table_shape_invalid(app_client):
     ('/test_tables/%2Farray1.json', 2, 1),
     ('/test_tables/%2Farray1.json?_size=1', 2, 2),
     ('/test_tables/%2Fgroup1%2Farray2.json?_size=1000', 10000, 10),
+    ('/test_tables/%2Fgroup2%2Fmulti.json?_size=5', 10, 2),
 ])
 def test_paginate_tables_and_arrays(app_client, path, expected_rows, expected_pages):
     fetched = []

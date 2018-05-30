@@ -213,6 +213,8 @@ class Connection:
                             value = table_row
                             if type(value) is bytes:
                                 value = value.decode('utf-8')
+                            elif not type(value) in (int, float, complex):
+                                value = str(value)
                             row['value'] = value
                     rows.append(row)
 
