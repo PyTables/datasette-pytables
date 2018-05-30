@@ -240,8 +240,11 @@ class Connection:
         elif sql == 'select sql from sqlite_master where name = :n and type="table"':
             try:
                 table = self.h5file.get_node(params['n'])
+                colnames = ['value']
+                if type(table) is tables.table.Table:
+                    colnames = table.colnames
                 row = Row()
-                row['sql'] = 'CREATE TABLE {} ()'.format(params['n'])
+                row['sql'] = 'CREATE TABLE {} ({})'.format(params['n'], ", ".join(colnames))
                 return [row]
             except:
                 return []
