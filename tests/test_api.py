@@ -18,7 +18,7 @@ def test_database_page(app_client):
     assert 'test_tables' == data['database']
     assert [{
         'name': '/array1',
-        'columns': [],
+        'columns': ['value'],
         'primary_keys': [],
         'count': 2,
         'label_column': None,
@@ -27,7 +27,7 @@ def test_database_page(app_client):
         'foreign_keys': {'incoming': [], 'outgoing': []}
     }, {
         'name': '/group1/array2',
-        'columns': [],
+        'columns': ['value'],
         'primary_keys': [],
         'count': 10000,
         'label_column': None,
@@ -45,7 +45,7 @@ def test_database_page(app_client):
         'foreign_keys': {'incoming': [], 'outgoing': []}
     }, {
         'name': '/group2/multi',
-        'columns': [],
+        'columns': ['value'],
         'primary_keys': [],
         'count': 10,
         'label_column': None,
