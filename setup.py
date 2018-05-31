@@ -1,8 +1,9 @@
 from setuptools import setup
 import os
 
-VERSION = '0.1'
-
+def get_version():
+    with open('VERSION') as fd:
+        return fd.read()
 
 def get_long_description():
     with open(os.path.join(
@@ -13,13 +14,13 @@ def get_long_description():
 
 setup(
     name='datasette-pytables',
+    version=get_version(),
     description='Datasette connector for loading pytables files (.h5)',
     long_description=get_long_description(),
     long_description_content_type='text/markdown',
     author='Javier Sancho',
     url='https://github.com/jsancho-gpl/datasette-pytables',
     license='Apache License, Version 2.0',
-    version=VERSION,
     packages=['datasette_pytables'],
     entry_points={
         'datasette.connectors': [
