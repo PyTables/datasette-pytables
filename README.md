@@ -2,7 +2,7 @@
 
 Datasette-PyTables provides a web interface and a JSON API for [PyTables](https://github.com/PyTables/PyTables) files, allowing them to be accessible for Javascript programs, for example. It works in conjunction with [Datasette-Core](https://github.com/PyTables/datasette-core), a modified version of the original [Datasette](https://github.com/simonw/datasette), which provides a web interface for SQLite files.
 
-The modified version is able to work with SQLite files, like the original project, but can accept external connectors for any kind of database files, so you can develop your own connector for your favourite data container if you want.
+The modified version is able to work with SQLite files, like the original project, but can accept external connectors for any kind of database files, so you can develop your own connector for your favourite data container if you want (read [developers doc](https://github.com/PyTables/datasette-pytables/blob/master/DEVELOPERS.md))
 
 ## Installation
 
