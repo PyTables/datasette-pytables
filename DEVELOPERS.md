@@ -37,13 +37,13 @@ Datasette runs through SQL queries, so your connector has to accept these querie
 
 The `execute` method receives:
 
-* sql: the query
-* params: a dictionary with the params used in the query
-* truncate: a boolean saying if the returned data can be separated in pages or not
-* page_size: the number of rows a page can contain
-* max_returned_rows: the maximum number of rows Datasette expects
+* **sql**: the query
+* **params**: a dictionary with the params used in the query
+* **truncate**: a boolean saying if the returned data can be separated in pages or not
+* **page_size**: the number of rows a page can contain
+* **max_returned_rows**: the maximum number of rows Datasette expects
 
-We need to parse the query because PyTables has his own style for queries, but other databases could work with the SQL queries without requiring any parsing.
+We need to parse the query because PyTables has its own style for queries, but other databases could work with the SQL queries without requiring any parsing.
 
 Sometimes, Datasette make queries to `sqlite_master`; you need to keep it in mind.
 
@@ -51,7 +51,7 @@ The `execute` method has to return a tuple with:
 
 * a list of rows (Datasette expects something like SQLite rows)
 * a boolean saying if the data is truncated, i.e., if we return all the rows or there are more rows than the maximum indicated in max_returned_rows
-* a tuple with the description of the columns in the form (('c1',), ('c2',), ...)
+* a tuple with the description of the columns in the form `(('c1',), ('c2',), ...)`
 
 ## Rows format
 
