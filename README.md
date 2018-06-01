@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/PyTables/datasette-pytables.svg?branch=master)](https://travis-ci.org/PyTables/datasette-pytables)
+
+
 # datasette-pytables
 
 Datasette-PyTables provides a web interface and a JSON API for [PyTables](https://github.com/PyTables/PyTables) files, allowing them to be accessible for Javascript programs, for example. It works in conjunction with [Datasette-Core](https://github.com/PyTables/datasette-core), a modified version of the original [Datasette](https://github.com/simonw/datasette), which provides a web interface for SQLite files.
