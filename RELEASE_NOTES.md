@@ -1,12 +1,12 @@
 # Release notes for datasette-pytables
 
 
-## Changes from 1.0.1 to 1.0.2
+## Changes from 1.0.2 to 1.0.3
 
   #XXX version-specific blurb XXX#
 
 
-## Initial version 1.0.1
+## Initial version 1.0.2
 
 * Filters (e.g. `temp >= 3`) are working.
 

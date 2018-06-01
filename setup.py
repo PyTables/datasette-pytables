@@ -3,7 +3,7 @@ import os
 
 def get_version():
     with open('VERSION') as fd:
-        return fd.read()
+        return fd.read().strip()
 
 def get_long_description():
     with open(os.path.join(
