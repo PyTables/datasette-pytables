@@ -1,4 +1,4 @@
-# Announcing datasette-pytables 1.0.0
+# Announcing datasette-pytables 1.0.1
 
 ## What's new
 

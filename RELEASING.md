@@ -7,6 +7,8 @@ Date: 2018-06-01
 
 ## Preliminaries
 
+* Update the version number at ``VERSION`` and ``ANNOUNCE.md``.
+
 * Make sure that ``RELEASE_NOTES.md`` and ``ANNOUNCE.md`` are up to
   date with the latest news in the release.
 
@@ -62,6 +64,7 @@ Date: 2018-06-01
   $ git clone https://github.com/PyTables/datasette-pytables
   $ cd datasette-pytables
   $ python setup.py build
+  $ pytest
 ```
 
 * Make the tarball with the command:
