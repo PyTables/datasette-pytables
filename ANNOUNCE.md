@@ -2,7 +2,9 @@
 
 ## What's new
 
-This is the first public release.  Many things are working, most specially:
+This is the first public release.  Please, some feedback would be very appreciate.
+
+Many things are working, most specially:
 
 * Filters (e.g. `temp >= 3`) are working.
 
