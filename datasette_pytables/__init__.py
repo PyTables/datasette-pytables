@@ -251,6 +251,7 @@ class Connection:
         else:
             raise Exception("SQLite queries cannot be executed with this connector")
 
+
 class Row(list):
     def __init__(self, values=None):
         self.labels = []
