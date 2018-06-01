@@ -16,3 +16,9 @@ Run `pip install datasette-pytables` to install both the forked version of Datas
 This will start a web server on port 8001; then you can access to your data visiting [http://localhost:8001/](http://localhost:8001/)
 
 Read the [Datasette documentation](http://datasette.readthedocs.io/en/latest/) for more advanced options.
+
+# TODO
+
+* Allow a clickable link when browsing tables with nested fields or multi-dimensional arrays
+
+* Show the columns that can be sorted by instead of just raising an exception.
