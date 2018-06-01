@@ -23,18 +23,18 @@ Date: 2018-06-01
 
 ## Tagging
 
-* Create a tag ``X.Y.Z`` from ``master``.  Use the next message:
+* Create a tag ``vX.Y.Z`` from ``master``.  Use the next message:
 
 ```
-    $ git tag -a X.Y.Z -m "Tagging version X.Y.Z"
+    $ git tag -a vX.Y.Z -m "Tagging version X.Y.Z"
 ```
 
-  Note: For release candidates, just add a rcN suffix to tag ("X.Y.ZrcN").
+  Note: For release candidates, just add a rcN suffix to tag ("vX.Y.ZrcN").
 
 * Or, alternatively, make a signed tag (requires gpg correctly configured):
 
 ```
-    $ git tag -s X.Y.Z -m "Tagging version X.Y.Z"
+    $ git tag -s vX.Y.Z -m "Tagging version X.Y.Z"
 ```
 
 * Push the tag to the Github repo:
