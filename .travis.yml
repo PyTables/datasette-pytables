@@ -8,4 +8,5 @@ before_install:
   - pip install pytest aiohttp beautifulsoup4
 
 script:
+  - python setup.py install
   - pytest
