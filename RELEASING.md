@@ -87,7 +87,7 @@ Do a quick check that the tarball is sane.
 
 ## Announcing
 
-* Send an announcement to the python-announce, python-users and pydata
+* Send an announcement to the pytables-announce, pytables-users and pydata
   lists.  Use the ``ANNOUNCE.md`` file as skeleton (or possibly as
   the definitive version).
 
@@ -100,6 +100,8 @@ Do a quick check that the tarball is sane.
   and add this place-holder instead:
 
   #XXX version-specific blurb XXX#
+
+* Update ``VERSION`` file to X.Y.(Z+1)-dev
 
 * Commit your changes with:
 
