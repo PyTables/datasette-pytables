@@ -146,6 +146,16 @@ class Connection:
             else:
                 query = parsed_sql['where']
 
+        # Sort by column
+        orderby = ''
+        if 'orderby' in parsed_sql:
+            orderby = parsed_sql['orderby']
+            if type(orderby) is list:
+                orderby = orderby[0]
+            orderby = orderby['value']
+            if orderby == 'rowid':
+                orderby = ''
+
         # Limit number of rows
         limit = None
         if 'limit' in parsed_sql:
@@ -159,6 +169,8 @@ class Connection:
         # Execute query
         if query:
             table_rows = table.where(query, params, start, end)
+        elif orderby:
+            table_rows = table.itersorted(orderby, start=start, stop=end)
         else:
             table_rows = table.iterrows(start, end)
 
