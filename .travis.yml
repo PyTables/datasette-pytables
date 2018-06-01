@@ -4,5 +4,8 @@ python:
   - 3.5
   - 3.6
 
+before_install:
+  - pip install pytest aiohttp beautifulsoup4
+
 script:
   - python setup.py test
