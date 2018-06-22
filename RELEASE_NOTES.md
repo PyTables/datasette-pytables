@@ -3,7 +3,7 @@
 
 ## Changes from 1.0.2 to 1.0.3
 
-  #XXX version-specific blurb XXX#
+* Freeze specific versions for moz-sql-parser and mo-future
 
 
 ## Initial version 1.0.2

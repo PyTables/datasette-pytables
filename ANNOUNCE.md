@@ -1,18 +1,8 @@
-# Announcing datasette-pytables 1.0.2
+# Announcing datasette-pytables 1.0.3
 
 ## What's new
 
-This is the first public release.  Please, some feedback would be very appreciate.
-
-Many things are working, most specially:
-
-* Filters (e.g. `temp >= 3`) are working.
-
-* Sorted by is working for columns with CSI indexes.
-
-* Pagination is implemented for the first dimension of tables or arrays.
-
-* Arrays can be visualized (at least when they are small).
+This new release of datasette-pytables fix a compatibility problem with the last versions of Mozilla SQL Parser, which is used by datasette-pytables for translating queries from SQL to NumExpr syntax.
 
 ## What it is
 
