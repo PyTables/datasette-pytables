@@ -44,6 +44,12 @@ Date: 2018-06-01
     $ git push --tags
 ```
 
+* Do the official release.  Go to:
+
+https://github.com/PyTables/datasette-pytables/releases/edit/vX.Y.Z
+
+and add the title for the release (vX.Y.Z) and the release notes there.
+
 
 ## Testing
 
