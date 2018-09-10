@@ -245,23 +245,22 @@ class Connection:
 
     def _execute_datasette_query(self, sql, params):
         "Datasette special queries for getting tables info"
-        if sql == "SELECT count(*) from sqlite_master WHERE type = 'view' and name=:n":
-            row = Row()
-            row['count(*)'] = 0
-            return [row]
-        elif sql == 'select sql from sqlite_master where name = :n and type="table"':
-            try:
-                table = self.h5file.get_node(params['n'])
-                colnames = ['value']
-                if type(table) is tables.table.Table:
-                    colnames = table.colnames
-                row = Row()
-                row['sql'] = 'CREATE TABLE {} ({})'.format(params['n'], ", ".join(colnames))
-                return [row]
-            except:
+        if sql == 'select sql from sqlite_master where name = :n and type=:t':
+            if params['t'] == 'view':
                 return []
+            else:
+                try:
+                    table = self.h5file.get_node(params['n'])
+                    colnames = ['value']
+                    if type(table) is tables.table.Table:
+                        colnames = table.colnames
+                    row = Row()
+                    row['sql'] = 'CREATE TABLE {} ({})'.format(params['n'], ", ".join(colnames))
+                    return [row]
+                except:
+                    return []
         else:
-            raise Exception("SQLite queries cannot be executed with this connector")
+            raise Exception("SQLite queries cannot be executed with this connector: %s, %s" % (sql, params))
 
 
 class Row(list):
