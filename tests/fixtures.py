@@ -1,3 +1,6 @@
+from datasette_connectors import monkey; monkey.patch_datasette()
+from datasette_connectors import connectors; connectors.load()
+
 from datasette.app import Datasette
 import numpy as np
 import os
