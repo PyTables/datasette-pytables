@@ -2,8 +2,6 @@ from .fixtures import app_client
 import pytest
 from urllib.parse import urlencode
 
-pytest.fixture(scope='module')(app_client)
-
 def test_homepage(app_client):
     _, response = app_client.get('/.json')
     assert response.status == 200

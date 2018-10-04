@@ -1,7 +1,4 @@
 from .fixtures import app_client
-import pytest
-
-pytest.fixture(scope='module')(app_client)
 
 def test_homepage(app_client):
     response = app_client.get('/', gather_request=False)

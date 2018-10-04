@@ -1,9 +1,11 @@
 from datasette.app import Datasette
 import numpy as np
 import os
+import pytest
 from tables import *
 import tempfile
 
+@pytest.fixture(scope='session')
 def app_client(max_returned_rows=None):
     with tempfile.TemporaryDirectory() as tmpdir:
         filepath = os.path.join(tmpdir, 'test_tables.h5')
