@@ -81,7 +81,7 @@ class Connection:
 
         if parsed_sql['from'] == 'sqlite_master':
             rows = self._execute_datasette_query(sql, params)
-            description = (('value',))
+            description = (('value',),)
             return rows, truncated, description
 
         table = self.h5file.get_node(parsed_sql['from'])
