@@ -1,9 +1,13 @@
 # Release notes for datasette-pytables
 
 
-## Changes from 1.0.3 to 1.0.4
+## Changes from 1.0.3 to 1.1.0
 
-  #XXX version-specific blurb XXX#
+* Communication with Datasette using datasette-connectors.
+
+* Fix compatibility problems with sqlite standard queries.
+
+* Fix some problems with fixtures when testing.
 
 
 ## Changes from 1.0.2 to 1.0.3
