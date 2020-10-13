@@ -3,7 +3,7 @@ import pytest
 from urllib.parse import urlencode
 
 def test_homepage(app_client):
-    _, response = app_client.get('/.json')
+    response = app_client.get('/.json')
     assert response.status == 200
     assert response.json.keys() == {'test_tables': 0}.keys()
     d = response.json['test_tables']

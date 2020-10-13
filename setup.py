@@ -28,7 +28,7 @@ setup(
         ],
     },
     install_requires=[
-        'datasette-connectors',
+        'datasette-connectors>=2.0.0',
         'tables',
         'moz-sql-parser==1.3.18033',
         'mo-future==1.6.18072'

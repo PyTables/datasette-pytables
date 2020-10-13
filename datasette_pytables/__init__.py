@@ -1,8 +1,58 @@
 from moz_sql_parser import parse
 import re
-import tables
 
-_connector_type = 'pytables'
+import tables
+import datasette_connectors as dc
+
+
+class PyTablesConnection(dc.Connection):
+    def __init__(self, path, connector):
+        super().__init__(path, connector)
+        self.h5file = tables.open_file(path)
+
+
+class PyTablesConnector(dc.Connector):
+    connector_type = 'pytables'
+    connection_class = PyTablesConnection
+
+    def table_names(self):
+        return [
+            node._v_pathname
+            for node in self.conn.h5file
+            if not(isinstance(node, tables.group.Group))
+        ]
+
+    def table_count(self, table_name):
+        table = self.conn.h5file.get_node(table_name)
+        return int(table.nrows)
+
+    def table_info(self, table_name):
+        table = self.conn.h5file.get_node(table_name)
+        colnames = ['value']
+        if isinstance(table, tables.table.Table):
+            colnames = table.colnames
+
+        return [
+            {
+                'idx': idx,
+                'name': colname,
+                'primary_key': False,
+            }
+            for idx, colname in enumerate(colnames)
+        ]
+
+    def hidden_table_names(self):
+        return []
+
+    def detect_spatialite(self):
+        return False
+
+    def view_names(self):
+        return []
+
+    def detect_fts(self, table_name):
+        return False
+
 
 def inspect(path):
     "Open file and return tables info"
@@ -31,7 +81,7 @@ def inspect(path):
 
 def _parse_sql(sql, params):
     # Table name
-    sql = re.sub('(?i)from \[(.*)]', 'from "\g<1>"', sql)
+    sql = re.sub(r'(?i)from \[(.*)]', r'from "\g<1>"', sql)
     # Params
     for param in params:
         sql = sql.replace(":" + param, param)
@@ -43,7 +93,7 @@ def _parse_sql(sql, params):
         for token in ['group by', 'order by', 'limit', '']:
             res = re.search('(?i)where (.*)' + token, sql)
             if res:
-                modified_sql = re.sub('(?i)where (.*)(' + token + ')', '\g<2>', sql)
+                modified_sql = re.sub('(?i)where (.*)(' + token + ')', r'\g<2>', sql)
                 parsed = parse(modified_sql)
                 parsed['where'] = res.group(1).strip()
                 break
