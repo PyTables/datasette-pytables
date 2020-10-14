@@ -30,8 +30,8 @@ setup(
     install_requires=[
         'datasette-connectors>=2.0.0',
         'tables',
-        'moz-sql-parser==1.3.18033',
-        'mo-future==1.6.18072'
+        'moz-sql-parser==3.32.20026',
+        'mo-future==3.89.20246'
     ],
     tests_require=['pytest', 'aiohttp']
 )
