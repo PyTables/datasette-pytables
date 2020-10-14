@@ -53,6 +53,9 @@ class PyTablesConnector(dc.Connector):
     def detect_fts(self, table_name):
         return False
 
+    def foreign_keys(self, table_name):
+        return []
+
 
 def inspect(path):
     "Open file and return tables info"

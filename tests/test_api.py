@@ -11,7 +11,7 @@ def test_homepage(app_client):
     assert d['tables_count'] == 5
 
 def test_database_page(app_client):
-    response = app_client.get('/test_tables.json', gather_request=False)
+    response = app_client.get('/test_tables.json')
     data = response.json
     assert 'test_tables' == data['database']
     assert [{
@@ -19,46 +19,46 @@ def test_database_page(app_client):
         'columns': ['value'],
         'primary_keys': [],
         'count': 2,
-        'label_column': None,
         'hidden': False,
         'fts_table': None,
-        'foreign_keys': {'incoming': [], 'outgoing': []}
+        'foreign_keys': {'incoming': [], 'outgoing': []},
+        'private': False,
     }, {
         'name': '/group1/array2',
         'columns': ['value'],
         'primary_keys': [],
         'count': 10000,
-        'label_column': None,
         'hidden': False,
         'fts_table': None,
-        'foreign_keys': {'incoming': [], 'outgoing': []}
+        'foreign_keys': {'incoming': [], 'outgoing': []},
+        'private': False,
     }, {
         'name': '/group1/table1',
         'columns': ['identity', 'idnumber', 'speed'],
         'primary_keys': [],
         'count': 10000,
-        'label_column': None,
         'hidden': False,
         'fts_table': None,
-        'foreign_keys': {'incoming': [], 'outgoing': []}
+        'foreign_keys': {'incoming': [], 'outgoing': []},
+        'private': False,
     }, {
         'name': '/group2/multi',
         'columns': ['value'],
         'primary_keys': [],
         'count': 10,
-        'label_column': None,
         'hidden': False,
         'fts_table': None,
-        'foreign_keys': {'incoming': [], 'outgoing': []}
+        'foreign_keys': {'incoming': [], 'outgoing': []},
+        'private': False,
     }, {
         'name': '/group2/table2',
         'columns': ['identity', 'idnumber', 'speed'],
         'primary_keys': [],
         'count': 10000,
-        'label_column': None,
         'hidden': False,
         'fts_table': None,
-        'foreign_keys': {'incoming': [], 'outgoing': []}
+        'foreign_keys': {'incoming': [], 'outgoing': []},
+        'private': False,
     }] == data['tables']
 
 def test_custom_sql(app_client):
