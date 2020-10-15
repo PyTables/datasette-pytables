@@ -90,7 +90,6 @@ def test_custom_complex_sql(app_client):
             'sql': 'select identity from [/group1/table1] where speed > 100 and idnumber < 55',
             '_shape': 'objects'
         }),
-        gather_request=False
     )
     data = response.json
     assert {
@@ -114,7 +113,6 @@ def test_custom_pytables_sql(app_client):
             'sql': 'select identity from [/group1/table1] where (speed > 100) & (speed < 500)',
             '_shape': 'objects'
             }),
-        gather_request=False
     )
     data = response.json
     assert {
@@ -134,7 +132,6 @@ def test_custom_pytables_sql(app_client):
 def test_invalid_custom_sql(app_client):
     response = app_client.get(
         '/test_tables.json?sql=.schema',
-        gather_request=False
     )
     assert response.status == 400
     assert response.json['ok'] is False
@@ -143,7 +140,6 @@ def test_invalid_custom_sql(app_client):
 def test_table_json(app_client):
     response = app_client.get(
         '/test_tables/%2Fgroup2%2Ftable2.json?_shape=objects',
-        gather_request=False
     )
     assert response.status == 200
     data = response.json
@@ -172,13 +168,12 @@ def test_table_not_exists_json(app_client):
         'status': 404,
         'title': None,
     } == app_client.get(
-        '/test_tables/blah.json', gather_request=False
+        '/test_tables/blah.json',
     ).json
 
 def test_table_shape_arrays(app_client):
     response = app_client.get(
         '/test_tables/%2Fgroup2%2Ftable2.json?_shape=arrays',
-        gather_request=False
     )
     assert [
         [6, 'This is particle:  6', 6, 12.0],
@@ -188,7 +183,6 @@ def test_table_shape_arrays(app_client):
 def test_table_shape_objects(app_client):
     response = app_client.get(
         '/test_tables/%2Fgroup2%2Ftable2.json?_shape=objects',
-        gather_request=False
     )
     assert [{
         'rowid': 6,
@@ -205,7 +199,6 @@ def test_table_shape_objects(app_client):
 def test_table_shape_array(app_client):
     response = app_client.get(
         '/test_tables/%2Fgroup2%2Ftable2.json?_shape=array',
-        gather_request=False
     )
     assert [{
         'rowid': 6,
@@ -222,7 +215,6 @@ def test_table_shape_array(app_client):
 def test_table_shape_invalid(app_client):
     response = app_client.get(
         '/test_tables/%2Fgroup2%2Ftable2.json?_shape=invalid',
-        gather_request=False
     )
     assert {
         'ok': False,
@@ -241,7 +233,7 @@ def test_paginate_tables_and_arrays(app_client, path, expected_rows, expected_pa
     fetched = []
     count = 0
     while path:
-        response = app_client.get(path, gather_request=False)
+        response = app_client.get(path)
         print("*****", response.json)
         assert 200 == response.status
         count += 1
