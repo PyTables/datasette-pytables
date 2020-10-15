@@ -67,7 +67,6 @@ def test_custom_sql(app_client):
             'sql': 'select identity from [/group1/table1]',
             '_shape': 'objects'
         }),
-        gather_request=False
     )
     data = response.json
     assert {
