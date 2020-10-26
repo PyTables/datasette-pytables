@@ -22,6 +22,8 @@ class PyTablesConnector(dc.Connector):
         'lte': '<=',
         'and': '&',
         'or': '|',
+        'binary_and': '&',
+        'binary_or': '|',
     }
 
     def table_names(self):
@@ -127,12 +129,22 @@ class PyTablesConnector(dc.Connector):
                 start = int(params['p0']) + 1
             else:
                 left, right = where[operator]
-                if left in params:
+
+                if isinstance(left, dict):
+                    left = "(" + _translate_where(left) + ")"
+                elif left in params:
                     _cast_param(right, left)
+
+                if isinstance(right, dict):
+                    right = "(" + _translate_where(right) + ")"
                 elif right in params:
                     _cast_param(left, right)
 
-                expr = "{left} {operator} {right}".format(left=left, operator=self.operators.get(operator, operator), right=right)
+                expr = "{left} {operator} {right}".format(
+                    left=left,
+                    operator=self.operators.get(operator, operator),
+                    right=right,
+                )
 
             return expr
 

@@ -88,20 +88,20 @@ def test_custom_complex_sql(app_client):
     response = app_client.get(
         '/test_tables.json?' + urlencode({
             'sql': 'select identity from [/group1/table1] where speed > 100 and idnumber < 55',
-            '_shape': 'objects'
+            '_shape': 'objects',
         }),
     )
     data = response.json
     assert {
         'sql': 'select identity from [/group1/table1] where speed > 100 and idnumber < 55',
-        'params': {}
+        'params': {},
     } == data['query']
     assert 4 == len(data['rows'])
     assert [
         {'identity': 'This is particle: 51'},
         {'identity': 'This is particle: 52'},
         {'identity': 'This is particle: 53'},
-        {'identity': 'This is particle: 54'}
+        {'identity': 'This is particle: 54'},
     ] == data['rows']
     assert ['identity'] == data['columns']
     assert 'test_tables' == data['database']
@@ -111,19 +111,19 @@ def test_custom_pytables_sql(app_client):
     response = app_client.get(
         '/test_tables.json?' + urlencode({
             'sql': 'select identity from [/group1/table1] where (speed > 100) & (speed < 500)',
-            '_shape': 'objects'
-            }),
+            '_shape': 'objects',
+        }),
     )
     data = response.json
     assert {
         'sql': 'select identity from [/group1/table1] where (speed > 100) & (speed < 500)',
-        'params': {}
+        'params': {},
     } == data['query']
     assert 199 == len(data['rows'])
     assert [
         {'identity': 'This is particle: 51'},
         {'identity': 'This is particle: 52'},
-        {'identity': 'This is particle: 53'}
+        {'identity': 'This is particle: 53'},
     ] == data['rows'][:3]
     assert ['identity'] == data['columns']
     assert 'test_tables' == data['database']
