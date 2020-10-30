@@ -173,8 +173,8 @@ def test_table_shape_arrays(app_client):
         '/test_tables/%2Fgroup2%2Ftable2.json?_shape=arrays',
     )
     assert [
-        [6, 'This is particle:  6', 6, 12.0],
-        [7, 'This is particle:  7', 7, 14.0],
+        ['This is particle:  6', 6, 12.0],
+        ['This is particle:  7', 7, 14.0],
     ] == response.json['rows'][6:8]
 
 def test_table_shape_objects(app_client):
@@ -182,12 +182,10 @@ def test_table_shape_objects(app_client):
         '/test_tables/%2Fgroup2%2Ftable2.json?_shape=objects',
     )
     assert [{
-        'rowid': 6,
         'identity': 'This is particle:  6',
         'idnumber': 6,
         'speed': 12.0,
     }, {
-        'rowid': 7,
         'identity': 'This is particle:  7',
         'idnumber': 7,
         'speed': 14.0,
@@ -198,12 +196,10 @@ def test_table_shape_array(app_client):
         '/test_tables/%2Fgroup2%2Ftable2.json?_shape=array',
     )
     assert [{
-        'rowid': 6,
         'identity': 'This is particle:  6',
         'idnumber': 6,
         'speed': 12.0,
     }, {
-        'rowid': 7,
         'identity': 'This is particle:  7',
         'idnumber': 7,
         'speed': 14.0,
@@ -231,7 +227,6 @@ def test_paginate_tables_and_arrays(app_client, path, expected_rows, expected_pa
     count = 0
     while path:
         response = app_client.get(path)
-        print("*****", response.json)
         assert 200 == response.status
         count += 1
         fetched.extend(response.json['rows'])
