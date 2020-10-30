@@ -118,12 +118,16 @@ class PyTablesConnector(dc.Connector):
         start = 0
         end = table.nrows
 
-        # Use 'where' statement or get all the rows
-        def _cast_param(field, pname):
-            # Cast value to the column type
+        def _get_field_type(field):
             coltype = table.dtype.name
             if type(table) is tables.table.Table:
                 coltype = table.coltypes[field]
+            return coltype
+
+        # Use 'where' statement or get all the rows
+        def _cast_param(field, pname):
+            # Cast value to the column type
+            coltype = _get_field_type(field)
             fcast = None
             if coltype == 'string':
                 fcast = str
@@ -266,7 +270,7 @@ class PyTablesConnector(dc.Connector):
                         row['count(*)'] = int(table.nrows)
                     elif field_name.get('json_type'):
                         field_name = field_name.get('json_type')
-                        row['json_type(' + field_name + ')'] = table.coltypes[field_name]
+                        row['json_type(' + field_name + ')'] = _get_field_type(field)
                     else:
                         raise Exception("Function not recognized")
                 else:
