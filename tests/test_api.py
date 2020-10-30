@@ -143,19 +143,16 @@ def test_table_json(app_client):
     )
     assert response.status == 200
     data = response.json
-    assert data['query']['sql'] == 'select rowid, * from [/group2/table2] order by rowid limit 51'
+    assert data['query']['sql'] == 'select identity, idnumber, speed from [/group2/table2] limit 51'
     assert data['rows'][3:6] == [{
-        'rowid': 3,
         'identity': 'This is particle:  3',
         'idnumber': 3,
         'speed': 6.0
     }, {
-        'rowid': 4,
         'identity': 'This is particle:  4',
         'idnumber': 4,
         'speed': 8.0
     }, {
-        'rowid': 5,
         'identity': 'This is particle:  5',
         'idnumber': 5,
         'speed': 10.0
