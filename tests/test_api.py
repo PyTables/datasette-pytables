@@ -232,6 +232,7 @@ def test_paginate_tables_and_arrays(app_client, path, expected_rows, expected_pa
         fetched.extend(response.json['rows'])
         path = response.json['next_url']
         if path:
+            path = path.replace('http://localhost', '')
             assert response.json['next']
             assert '_next={}'.format(response.json['next']) in path
 

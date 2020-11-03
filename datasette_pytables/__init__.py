@@ -198,6 +198,11 @@ class PyTablesConnector(dc.Connector):
         if 'limit' in parsed_sql:
             limit = int(parsed_sql['limit'])
 
+        # Offset
+        offset = None
+        if 'offset' in parsed_sql:
+            offset = int(parsed_sql['offset'])
+
         # Truncate if needed
         if page_size and max_returned_rows and truncate:
             if max_returned_rows == page_size:
@@ -245,6 +250,8 @@ class PyTablesConnector(dc.Connector):
         # Get results
         get_rowid = make_get_rowid()
         get_row_value = make_get_row_value()
+        if offset:
+            table_rows = table_rows[offset:]
         count = 0
         for table_row in table_rows:
             count += 1
