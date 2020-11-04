@@ -277,7 +277,7 @@ class PyTablesConnector(dc.Connector):
                         row['count(*)'] = int(table.nrows)
                     elif field_name.get('json_type'):
                         field_name = field_name.get('json_type')
-                        row['json_type(' + field_name + ')'] = _get_field_type(field)
+                        row['json_type(' + field_name + ')'] = _get_field_type(field_name)
                     else:
                         raise Exception("Function not recognized")
                 else:
