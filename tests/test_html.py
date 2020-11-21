@@ -12,17 +12,17 @@ def test_database_page(app_client_with_hash):
     assert 'test_tables' in response.text
 
 def test_table(app_client):
-    response = app_client.get('/test_tables/%2Fgroup1%2Ftable1')
+    response = app_client.get('/test_tables/%group1%table1')
     assert response.status == 200
 
 def test_table_row(app_client):
-    response = app_client.get('/test_tables/%2Fgroup1%2Ftable1/50')
+    response = app_client.get('/test_tables/%group1%table1/50')
     assert response.status == 200
 
 def test_array(app_client):
-    response = app_client.get('/test_tables/%2Fgroup1%2Farray2')
+    response = app_client.get('/test_tables/%group1%array2')
     assert response.status == 200
 
 def test_array_row(app_client):
-    response = app_client.get('/test_tables/%2Fgroup1%2Farray2/1050')
+    response = app_client.get('/test_tables/%group1%array2/1050')
     assert response.status == 200

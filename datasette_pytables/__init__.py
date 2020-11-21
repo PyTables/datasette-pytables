@@ -26,30 +26,50 @@ class PyTablesConnector(dc.Connector):
         'binary_or': '|',
     }
 
+    def _serialize_table_name(self, table_name):
+        return table_name.replace('/', '%')
+
+    def _deserialize_table_name(self, table_name):
+        return table_name.replace('%', '/')
+
     def table_names(self):
         return [
-            node._v_pathname
+            self._serialize_table_name(node._v_pathname)
             for node in self.conn.h5file
             if not(isinstance(node, tables.group.Group))
         ]
 
     def table_count(self, table_name):
-        table = self.conn.h5file.get_node(table_name)
+        table = self.conn.h5file.get_node(self._deserialize_table_name(table_name))
         return int(table.nrows)
 
     def table_info(self, table_name):
-        table = self.conn.h5file.get_node(table_name)
-        colnames = ['value']
+        table = self.conn.h5file.get_node(self._deserialize_table_name(table_name))
+        columns = [
+            {
+                'name': 'value',
+                'type': table.dtype.name,
+            }
+        ]
         if isinstance(table, tables.table.Table):
-            colnames = table.colnames
+            columns = [
+                {
+                    'name': colname,
+                    'type': table.coltypes[colname],
+                }
+                for colname in table.colnames
+            ]
 
         return [
             {
-                'idx': idx,
-                'name': colname,
-                'primary_key': False,
+                'cid': cid,
+                'name': column['name'],
+                'type': column['type'],
+                'notnull': True,
+                'default_value': None,
+                'is_pk': False,
             }
-            for idx, colname in enumerate(colnames)
+            for cid, column in enumerate(columns)
         ]
 
     def hidden_table_names(self):
@@ -69,12 +89,13 @@ class PyTablesConnector(dc.Connector):
 
     def table_exists(self, table_name):
         try:
-            self.conn.h5file.get_node(table_name)
+            self.conn.h5file.get_node(self._deserialize_table_name(table_name))
             return True
         except:
             return False
 
     def table_definition(self, table_type, table_name):
+        table_name = self._deserialize_table_name(table_name)
         table = self.conn.h5file.get_node(table_name)
         colnames = ['value']
         if isinstance(table, tables.table.Table):
@@ -107,7 +128,7 @@ class PyTablesConnector(dc.Connector):
             # Pytables does not support subqueries
             parsed_sql['from'] = parsed_sql['from']['value']['from']
 
-        table = self.conn.h5file.get_node(parsed_sql['from'])
+        table = self.conn.h5file.get_node(self._deserialize_table_name(parsed_sql['from']))
         table_rows = []
         fields = parsed_sql['select']
         colnames = ['value']
