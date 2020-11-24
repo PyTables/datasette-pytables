@@ -19,12 +19,13 @@ setup(
     long_description=get_long_description(),
     long_description_content_type='text/markdown',
     author='Javier Sancho',
+    author_email='jsf@jsancho.org',
     url='https://github.com/jsancho-gpl/datasette-pytables',
     license='Apache License, Version 2.0',
     packages=['datasette_pytables'],
     entry_points={
         'datasette.connectors': [
-            'pytables = datasette_pytables'
+            'pytables = datasette_pytables:PyTablesConnector'
         ],
     },
     install_requires=[

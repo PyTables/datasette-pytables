@@ -122,6 +122,10 @@ class PyTablesConnector(dc.Connector):
         truncated = False
         description = ()
 
+        # Some Datasette queries uses glob operand, not supported by Pytables
+        if ' glob ' in sql:
+            return results, truncated, description
+
         parsed_sql = parse_sql(sql, params)
 
         while isinstance(parsed_sql['from'], dict):
@@ -231,8 +235,7 @@ class PyTablesConnector(dc.Connector):
 
         # Execute query
         if query:
-            if not ' glob ' in query:
-                table_rows = table.where(query, params, start, end)
+            table_rows = table.where(query, params, start, end)
         elif orderby:
             table_rows = table.itersorted(orderby, start=start, stop=end)
         else:

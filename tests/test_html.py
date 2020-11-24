@@ -26,3 +26,7 @@ def test_array(app_client):
 def test_array_row(app_client):
     response = app_client.get('/test_tables/%group1%array2/1050')
     assert response.status == 200
+
+def test_table_exact_query(app_client):
+    response = app_client.get('/test_tables/%group2%table2/?idnumber__exact=0')
+    assert response.status == 200
