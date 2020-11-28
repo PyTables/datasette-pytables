@@ -1,6 +1,11 @@
 # Release notes for datasette-pytables
 
 
+## Changes from 2.0.1 to 2.0.2-dev
+
+  #XXX version-specific blurb XXX#
+
+
 ## Changes from 1.1.0 to 2.0.1
 
 * Communication with Datasette using datasette-connectors 2.0.1
