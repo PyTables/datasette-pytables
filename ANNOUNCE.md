@@ -1,8 +1,8 @@
-# Announcing datasette-pytables 2.0.0
+# Announcing datasette-pytables 2.0.1
 
 ## What's new
 
-This new release of datasette-pytables uses datasette-connectors 2.0.0, which provides the last Datasette version with design and security improvings and many changes in its API. The main change for datasette-pytables users is that percent character has to be used instead slash for table names when writing queries in the Datasette query editor.
+This new release of datasette-pytables uses datasette-connectors 2.0.1, which provides the last Datasette version with design and security improvings and many changes in its API. The main change for datasette-pytables users is that percent character has to be used instead slash for table names when writing queries in the Datasette query editor.
 
 ## What it is
 
